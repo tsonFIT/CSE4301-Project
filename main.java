@@ -3,6 +3,117 @@ import java.util.List;
 import java.util.Scanner;
 
 public class main {
+	public static String[][] copyBoard(String[][] board) {
+	    String[][] newBoard = new String[board.length][board[0].length];
+	    
+	    for (int i = 0; i < board.length; i++) {
+	        for (int j = 0; j < board[i].length; j++) {
+	            newBoard[i][j] = board[i][j]; // Copy each element
+	        }
+	    }
+	    
+	    return newBoard;
+	}
+	public static List<int[]> getAllLegalMoves(String[][] board, String symbol) {
+	    List<int[]> legalMoves = new ArrayList<>();
+
+	    // Iterate over every cell on the board
+	    for (int y = 0; y < board.length; y++) {
+	        for (int x = 0; x < board[y].length; x++) {
+	            // If it's a valid move for the current player, add it to the list
+	            if (validMove(board, x, y, symbol)) {
+	                legalMoves.add(new int[]{y, x});
+	            }
+	        }
+	    }
+
+	    return legalMoves;
+	}
+	public static boolean isGameOver(String[][] board) {
+		boolean black = hasValidMove(board, "B");
+		boolean white = hasValidMove(board, "W");
+		return !(black || white);
+	}
+	public static int evaluateBoard(String[][] board, String symbol) {
+	    int score = 0;
+	    String oppSymbol = symbol.equals("W") ? "B" : "W";
+
+	    // Count the number of pieces for both players
+	    for (int i = 0; i < board.length; i++) {
+	        for (int j = 0; j < board[i].length; j++) {
+	            if (board[i][j].equals(symbol)) {
+	                score += 1;
+	            } else if (board[i][j].equals(oppSymbol)) {
+	                score -= 1;
+	            }
+	        }
+	    }
+
+	    return score;
+	}
+	public static int minimax(String[][] board, int depth, int alpha, int beta, boolean maximizingPlayer, String currentPlayer) {
+	    if (depth == 0 || isGameOver(board)) {
+	        return evaluateBoard(board, maximizingPlayer ? "B" : "W");
+	    }
+
+	    String opponent = currentPlayer.equals("B") ? "W" : "B";
+	    
+	    if (maximizingPlayer) {
+	        int maxEval = Integer.MIN_VALUE;
+	        List<int[]> legalMoves = getAllLegalMoves(board, currentPlayer);
+
+	        for (int[] move : legalMoves) {
+	            String[][] newBoard = copyBoard(board);
+	            makeMove(newBoard, move[1], move[0], currentPlayer);
+
+	            int eval = minimax(newBoard, depth - 1, alpha, beta, false, opponent);
+	            maxEval = Math.max(maxEval, eval);
+	            alpha = Math.max(alpha, eval);
+
+	            if (beta <= alpha) {
+	                break; // Beta cut-off
+	            }
+	        }
+	        return maxEval;
+	    } else {
+	        int minEval = Integer.MAX_VALUE;
+	        List<int[]> legalMoves = getAllLegalMoves(board, currentPlayer);
+
+	        for (int[] move : legalMoves) {
+	            String[][] newBoard = copyBoard(board);
+	            makeMove(newBoard, move[1], move[0], currentPlayer);
+
+	            int eval = minimax(newBoard, depth - 1, alpha, beta, true, opponent);
+	            minEval = Math.min(minEval, eval);
+	            beta = Math.min(beta, eval);
+
+	            if (beta <= alpha) {
+	                break; // Alpha cut-off
+	            }
+	        }
+	        return minEval;
+	    }
+	}
+	public static int[] findBestMove(String[][] board, String symbol) {
+	    int bestValue = Integer.MIN_VALUE;
+	    int[] bestMove = null;
+	    
+	    List<int[]> legalMoves = getAllLegalMoves(board, symbol);
+
+	    for (int[] move : legalMoves) {
+	        String[][] newBoard = copyBoard(board);
+	        makeMove(newBoard, move[1], move[0], symbol);
+	        
+	        int boardValue = minimax(newBoard, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, false, symbol); // depth = 5
+
+	        if (boardValue > bestValue) {
+	            bestValue = boardValue;
+	            bestMove = move;
+	        }
+	    }
+
+	    return bestMove; // Returns the best (y, x) coordinates for the AI's move
+	}
     public static boolean validMove(String[][] board, int x, int y, String symbol) {
         String oppSymbol = symbol.equals("W") ? "B" : "W";
         boolean isValid = false;
@@ -117,34 +228,110 @@ public class main {
 
     String currentPlayer = "B";
     boolean gameRunning = true;
+    System.out.println("What pieces do you want to play with?\nBlack (B) or White (W)? ");
+    String answer = input.nextLine();
+    if (answer.equals("W")) {
+    	while (gameRunning) {
+    	    printBoard(board);
 
-    while (gameRunning) {
-        printBoard(board);
-        if (hasValidMove(board, currentPlayer)) {
-            System.out.println(currentPlayer + "'s turn.");
-            System.out.print("Enter Y coordinate: ");
-            int y = input.nextInt();
-            System.out.print("Enter X coordinate: ");
-            int x = input.nextInt();
+    	    if (hasValidMove(board, currentPlayer)) {
+    	        if (currentPlayer.equals("B")) {
+    	            System.out.println("AI (B) is making a move...");
+    	            int[] aiMove = findBestMove(board, "B");
+    	            makeMove(board, aiMove[1], aiMove[0], "B");
+    	        } else {
+    	            System.out.println("Player (W)'s turn.");
+    	            System.out.print("Enter Y coordinate: ");
+    	            int y = input.nextInt();
+    	            System.out.print("Enter X coordinate: ");
+    	            int x = input.nextInt();
 
-            // Make a move if it's valid
-            if (validMove(board, x, y, currentPlayer)) {
-                makeMove(board, x, y, currentPlayer);
-                printBoard(board);
+    	            if (validMove(board, x, y, currentPlayer)) {
+    	                makeMove(board, x, y, currentPlayer);
+    	            } else {
+    	                System.out.println("Invalid move. Try again.");
+    	                continue;
+    	            }
+    	        }
 
-                // Switch players
-                currentPlayer = currentPlayer.equals("B") ? "W" : "B";
+    	        // Switch players
+    	        currentPlayer = currentPlayer.equals("B") ? "W" : "B";
+    	    } else {
+    	        System.out.println(currentPlayer + " has no valid moves and must pass.");
+    	        currentPlayer = currentPlayer.equals("B") ? "W" : "B";
+
+    	        if (!hasValidMove(board, currentPlayer)) {
+    	            System.out.println("No valid moves for both players. Game over.");
+    	            gameRunning = false;
+    	        }
+    	    }
+    	}
+    }
+    else if (answer.equals("B")) {
+    	while (gameRunning) {
+    	    printBoard(board);
+    	    if (hasValidMove(board, currentPlayer)) {
+    	        if (currentPlayer.equals("B")) {
+    	        	System.out.println("Player (B)'s turn.");
+    	            System.out.print("Enter Y coordinate: ");
+    	            int y = input.nextInt();
+    	            System.out.print("Enter X coordinate: ");
+    	            int x = input.nextInt();
+
+    	            if (validMove(board, x, y, currentPlayer)) {
+    	                makeMove(board, x, y, currentPlayer);
+    	            } else {
+    	                System.out.println("Invalid move. Try again.");
+    	                continue;
+    	            }
+    	        } else {
+    	        	System.out.println("AI (W) is making a move...");
+    	            int[] aiMove = findBestMove(board, "W");
+    	            makeMove(board, aiMove[1], aiMove[0], "W");
+    	        }
+
+    	        // Switch players
+    	        currentPlayer = currentPlayer.equals("B") ? "W" : "B";
+    	    } else {
+    	        System.out.println(currentPlayer + " has no valid moves and must pass.");
+    	        currentPlayer = currentPlayer.equals("B") ? "W" : "B";
+
+    	        if (!hasValidMove(board, currentPlayer)) {
+    	            System.out.println("No valid moves for both players. Game over.");
+    	            gameRunning = false;
+    	        }
+    	    }
+    	}
+    }
+    else {
+    	while (gameRunning) {
+            printBoard(board);
+            if (hasValidMove(board, currentPlayer)) {
+                System.out.println(currentPlayer + "'s turn.");
+                System.out.print("Enter Y coordinate: ");
+                int y = input.nextInt();
+                System.out.print("Enter X coordinate: ");
+                int x = input.nextInt();
+
+                // Make a move if it's valid
+                if (validMove(board, x, y, currentPlayer)) {
+                    makeMove(board, x, y, currentPlayer);
+                    printBoard(board);
+
+                    // Switch players
+                    currentPlayer = currentPlayer.equals("B") ? "W" : "B";
+                } else {
+                    System.out.println("Invalid move. Try again.");
+                }
             } else {
-                System.out.println("Invalid move. Try again.");
-            }
-        } else {
-            System.out.println(currentPlayer + " has no valid moves and must pass.");
-            currentPlayer = currentPlayer.equals("B") ? "W" : "B";
+                System.out.println(currentPlayer + " has no valid moves and must pass.");
+                currentPlayer = currentPlayer.equals("B") ? "W" : "B";
 
-            // Check if both players have no moves
-            if (!hasValidMove(board, currentPlayer)) {
-                System.out.println("No valid moves for both players. Game over.");
-                gameRunning = false;
+                // Check if both players have no moves
+                if (!hasValidMove(board, currentPlayer)) {
+                    System.out.println("No valid moves for both players. Game over.");
+                    gameRunning = false;
+                }
             }
         }
     }
