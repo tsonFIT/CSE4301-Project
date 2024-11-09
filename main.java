@@ -38,17 +38,41 @@ public class main {
         int score = 0;
         String oppSymbol = symbol.equals("W") ? "B" : "W";
 
-        // Count the number of pieces for both players
+        int pieceCount = 0; 
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                if (board[i][j].equals(symbol)) {
-                    score += 1;
-                } else if (board[i][j].equals(oppSymbol)) {
-                    score -= 1;
-                }
+                if (board[i][j].equals(symbol)) pieceCount++;
+                else if (board[i][j].equals(oppSymbol)) pieceCount--;
             }
         }
 
+        int mobility = getAllLegalMoves(board, symbol).size() - getAllLegalMoves(board, oppSymbol).size();
+        int stability = 0;
+        int[][] stablePositions = {{0, 0}, {0, 7}, {7, 0}, {7, 7}};
+        for (int[] pos : stablePositions) {
+            if (board[pos[0]][pos[1]].equals(symbol)) stability += 5;
+            else if (board[pos[0]][pos[1]].equals(oppSymbol)) stability -= 5;
+        }
+
+        int positionalValue = 0;
+        int[][] positionValues = {
+            {4, -2, 2, 2, 2, 2, -2, 4},
+            {-2, -3, 1, 1, 1, 1, -3, -2},
+            {2, 1, 1, 0, 0, 1, 1, 2},
+            {2, 1, 0, 1, 1, 0, 1, 2},
+            {2, 1, 0, 1, 1, 0, 1, 2},
+            {2, 1, 1, 0, 0, 1, 1, 2},
+            {-2, -3, 1, 1, 1, 1, -3, -2},
+            {4, -2, 2, 2, 2, 2, -2, 4}
+        };
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if (board[i][j].equals(symbol)) positionalValue += positionValues[i][j];
+                else if (board[i][j].equals(oppSymbol)) positionalValue -= positionValues[i][j];
+            }
+        }
+
+        score = pieceCount + mobility * 2 + stability * 4 + positionalValue;
         return score;
     }
     public static int minimax(String[][] board, int depth, int alpha, int beta, boolean maximizingPlayer, String currentPlayer) {
