@@ -296,7 +296,7 @@ public static boolean validMove(String[][] board, int x, int y, String symbol) {
         while (gameRunning) {
             printBoard(board);
 
-            if (hasValidMove(board, currentPlayer)) {
+            if (hasValidMove(board, currentPlayer) && findBestMove(board, currentPlayer) != null) {
                 if (currentPlayer.equals("B")) {
                     System.out.println("AI (B) is making a move...");
                     int[] aiMove = findBestMove(board, "B");
@@ -332,7 +332,7 @@ public static boolean validMove(String[][] board, int x, int y, String symbol) {
     else if (answer.equals("B")) {
         while (gameRunning) {
             printBoard(board);
-            if (hasValidMove(board, currentPlayer)) {
+            if (hasValidMove(board, currentPlayer) && findBestMove(board, currentPlayer) != null) {
                 if (currentPlayer.equals("B")) {
                     System.out.println("Player (B)'s turn.");
                     System.out.print("Enter Y coordinate: ");
