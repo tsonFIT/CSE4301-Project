@@ -72,7 +72,42 @@ public class main {
             }
         }
 
-        score = pieceCount + mobility * 2 + stability * 4 + positionalValue;
+        score = pieceCount + mobility * 6 + stability * 7 + positionalValue;
+     // Define positions adjacent to each corner
+        int[][] cornerAdjacents = {
+            {0, 1}, {1, 0}, {1, 1}, // Top-left
+            {0, 6}, {1, 7}, {1, 6}, // Top-right
+            {6, 0}, {7, 1}, {6, 1}, // Bottom-left
+            {6, 7}, {7, 6}, {6, 6}  // Bottom-right
+        };
+
+        // Check if corners are occupied
+        int[][] corners = {{0, 0}, {0, 7}, {7, 0}, {7, 7}};
+        for (int i = 0; i < 4; i++) {
+            int[] corner = corners[i];
+            String cornerValue = board[corner[0]][corner[1]];
+
+            // Penalize adjacent squares if corner is unoccupied
+            if (cornerValue.equals("-")) {
+                for (int[] adj : cornerAdjacents) {
+                    if (adj[0] == corner[0] || adj[1] == corner[1]) {
+                        if (board[adj[0]][adj[1]].equals(symbol)) {
+                            score -= 100;
+                        } else if (board[adj[0]][adj[1]].equals(oppSymbol)) {
+                            score += 100;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Calculate based on pieces and positional advantage
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if (board[i][j].equals(symbol)) score++;
+                else if (board[i][j].equals(oppSymbol)) score--;
+            }
+        }
         return score;
     }
     public static int minimax(String[][] board, int depth, int alpha, int beta, boolean maximizingPlayer, String currentPlayer) {
