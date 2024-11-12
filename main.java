@@ -34,6 +34,7 @@ public class main {
         boolean white = hasValidMove(board, "W");
         return !(black || white);
     }
+
     public static int evaluateBoard(String[][] board, String symbol) {
         int score = 0;
         String oppSymbol = symbol.equals("W") ? "B" : "W";
@@ -50,8 +51,8 @@ public class main {
         int stability = 0;
         int[][] stablePositions = {{0, 0}, {0, 7}, {7, 0}, {7, 7}};
         for (int[] pos : stablePositions) {
-            if (board[pos[0]][pos[1]].equals(symbol)) stability += 400;
-            else if (board[pos[0]][pos[1]].equals(oppSymbol)) stability -= 400;
+            if (board[pos[0]][pos[1]].equals(symbol)) stability += 10000;
+            else if (board[pos[0]][pos[1]].equals(oppSymbol)) stability -= 1000;
         }
 
         int positionalValue = 0;
@@ -72,7 +73,7 @@ public class main {
             }
         }
 
-        score = pieceCount + mobility * 6 + stability * 7 + positionalValue;
+        score = pieceCount * 10 + mobility * 10 + stability * 1 + positionalValue * 1;
      // Define positions adjacent to each corner
         int[][] cornerAdjacents = {
             {0, 1}, {1, 0}, {1, 1}, // Top-left
@@ -92,9 +93,9 @@ public class main {
                 for (int[] adj : cornerAdjacents) {
                     if (adj[0] == corner[0] || adj[1] == corner[1]) {
                         if (board[adj[0]][adj[1]].equals(symbol)) {
-                            score -= 100;
+                            score -= 10000;
                         } else if (board[adj[0]][adj[1]].equals(oppSymbol)) {
-                            score += 100;
+                            score += 10000;
                         }
                     }
                 }
@@ -107,6 +108,12 @@ public class main {
                 if (board[i][j].equals(symbol)) score++;
                 else if (board[i][j].equals(oppSymbol)) score--;
             }
+        }
+
+        // if black always goes first:
+        // black must get highest number while white gets lowest number
+        if (symbol.equals("W")) {
+            score *= -1;
         }
         return score;
     }
@@ -331,7 +338,7 @@ public static boolean validMove(String[][] board, int x, int y, String symbol) {
         while (gameRunning) {
             printBoard(board);
 
-            if (hasValidMove(board, currentPlayer) && findBestMove(board, currentPlayer) != null) {
+            if (hasValidMove(board, currentPlayer) || findBestMove(board, currentPlayer) != null) {
                 if (currentPlayer.equals("B")) {
                     System.out.println("AI (B) is making a move...");
                     int[] aiMove = findBestMove(board, "B");
@@ -367,7 +374,7 @@ public static boolean validMove(String[][] board, int x, int y, String symbol) {
     else if (answer.equals("B")) {
         while (gameRunning) {
             printBoard(board);
-            if (hasValidMove(board, currentPlayer) && findBestMove(board, currentPlayer) != null) {
+            if (hasValidMove(board, currentPlayer) || findBestMove(board, currentPlayer) != null) {
                 if (currentPlayer.equals("B")) {
                     System.out.println("Player (B)'s turn.");
                     System.out.print("Enter Y coordinate: ");
