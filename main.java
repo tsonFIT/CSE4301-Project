@@ -50,8 +50,8 @@ public class main {
         int stability = 0;
         int[][] stablePositions = {{0, 0}, {0, 7}, {7, 0}, {7, 7}};
         for (int[] pos : stablePositions) {
-            if (board[pos[0]][pos[1]].equals(symbol)) stability += 5;
-            else if (board[pos[0]][pos[1]].equals(oppSymbol)) stability -= 5;
+            if (board[pos[0]][pos[1]].equals(symbol)) stability += 400;
+            else if (board[pos[0]][pos[1]].equals(oppSymbol)) stability -= 400;
         }
 
         int positionalValue = 0;
@@ -186,7 +186,7 @@ public class main {
             bestMove = move;  // Update the best move
         }
     }
-
+    System.out.println("Best value for the board for player "+symbol+". (largest of all): " + bestValue);
     return bestMove; // Return the best move for the AI
 }
 
@@ -343,7 +343,7 @@ public static boolean validMove(String[][] board, int x, int y, String symbol) {
                     System.out.print("Enter X coordinate: ");
                     int x = input.nextInt();
 
-                    if (validMove(board, x, y, currentPlayer)) {
+                    if ((x > -1 && x < 8 && y > -1 && y < 8) && validMove(board, x, y, currentPlayer)) {
                         makeMove(board, x, y, currentPlayer);
                     } else {
                         System.out.println("Invalid move. Try again.");
@@ -375,7 +375,7 @@ public static boolean validMove(String[][] board, int x, int y, String symbol) {
                     System.out.print("Enter X coordinate: ");
                     int x = input.nextInt();
 
-                    if (validMove(board, x, y, currentPlayer)) {
+                    if ((x > -1 && x < 8 && y > -1 && y < 8) && validMove(board, x, y, currentPlayer)) {
                         makeMove(board, x, y, currentPlayer);
                     } else {
                         System.out.println("Invalid move. Try again.");
@@ -411,7 +411,7 @@ public static boolean validMove(String[][] board, int x, int y, String symbol) {
                 int x = input.nextInt();
 
                 // Make a move if it's valid
-                if (validMove(board, x, y, currentPlayer)) {
+                if ((x > -1 && x < 8 && y > -1 && y < 8) && validMove(board, x, y, currentPlayer)) {
                     makeMove(board, x, y, currentPlayer);
                     printBoard(board);
 
