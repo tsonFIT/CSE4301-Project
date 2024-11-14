@@ -235,7 +235,14 @@ public class main {
         makeMove(newBoard, move[1], move[0], symbol);  // Make the move on the copied board
 
         // Call minimax with Alpha-Beta pruning. Depth of 5 for difficulty adjustment
-        int boardValue = minimax(newBoard, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, false, symbol);
+        //int boardValue = minimax(newBoard, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, false, symbol);
+        int boardValue = 0;
+        if (symbol.equals("W")) {
+            boardValue = minimax(newBoard, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, false, symbol);
+        }
+        else {
+            boardValue = minimax(newBoard, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, true, symbol);
+        }
 
         // Update best move if this move has a better value
         if (boardValue > bestValue) {
