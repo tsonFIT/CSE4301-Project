@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class main {
-	static int[][] positionValues = {
+    static int[][] positionValues = {
             {4, -2, 2, 2, 2, 2, -2, 4},
             {-2, -3, 1, 1, 1, 1, -3, -2},
             {2, 1, 1, 0, 0, 1, 1, 2},
@@ -161,6 +161,10 @@ public class main {
             }
         }
         updatePositionalValues(board, symbol);
+
+        if (symbol.equals("W")) {
+            score *= -1;
+        }
         return score;
     }
     public static int minimax(String[][] board, int depth, int alpha, int beta, boolean maximizingPlayer, String currentPlayer) {
@@ -175,7 +179,7 @@ public class main {
     // Maximizing player's move (AI)
     if (maximizingPlayer) {
         int maxEval = Integer.MIN_VALUE;
-        List<int[]> legalMoves = getAllLegalMoves(board, currentPlayer);
+        List<int[]> legalMoves = getAllLegalMoves(board, "B");
 
         for (int[] move : legalMoves) {
             // Copy board and make the move
@@ -197,7 +201,7 @@ public class main {
     // Minimizing player's move (opponent)
     } else {
         int minEval = Integer.MAX_VALUE;
-        List<int[]> legalMoves = getAllLegalMoves(board, currentPlayer);
+        List<int[]> legalMoves = getAllLegalMoves(board, "W");
 
         for (int[] move : legalMoves) {
             // Copy board and make the move
