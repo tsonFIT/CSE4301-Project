@@ -3,6 +3,16 @@ import java.util.List;
 import java.util.Scanner;
 
 public class main {
+	static int[][] positionValues = {
+            {4, -2, 2, 2, 2, 2, -2, 4},
+            {-2, -3, 1, 1, 1, 1, -3, -2},
+            {2, 1, 1, 0, 0, 1, 1, 2},
+            {2, 1, 0, 1, 1, 0, 1, 2},
+            {2, 1, 0, 1, 1, 0, 1, 2},
+            {2, 1, 1, 0, 0, 1, 1, 2},
+            {-2, -3, 1, 1, 1, 1, -3, -2},
+            {4, -2, 2, 2, 2, 2, -2, 4}
+        };
     public static String[][] copyBoard(String[][] board) {
         String[][] newBoard = new String[board.length][board[0].length];
         
@@ -34,6 +44,37 @@ public class main {
         boolean white = hasValidMove(board, "W");
         return !(black || white);
     }
+    public static boolean isCorner(int x, int y) {
+        int maxIndex = 7; // assuming an 8x8 board
+        return (x == 0 && y == 0) || (x == 0 && y == maxIndex) ||
+               (x == maxIndex && y == 0) || (x == maxIndex && y == maxIndex);
+    }
+
+    public static boolean isValidPosition(int x, int y) {
+        return x >= 0 && x < 8 && y >= 0 && y < 8; // again, assuming an 8x8 board
+    }
+    public static void updatePositionalValues(String[][] board, String symbol) {
+        // Reduce values of squares adjacent to newly placed corner pieces
+        int[][] directions = {
+            {-1, 0}, {1, 0}, {0, -1}, {0, 1},
+            {-1, -1}, {-1, 1}, {1, -1}, {1, 1}
+        };
+
+        for (int y = 0; y < board.length; y++) {
+            for (int x = 0; x < board[y].length; x++) {
+                if (isCorner(x, y) && board[y][x].equals(symbol)) {
+                    // Lower the adjacent values
+                    for (int[] dir : directions) {
+                        int newY = y + dir[0];
+                        int newX = x + dir[1];
+                        if (isValidPosition(newX, newY) && board[newY][newX].equals("-")) {
+                            positionValues[newY][newX] -= -2;
+                        }
+                    }
+                }
+            }
+        }
+    }
     public static int evaluateBoard(String[][] board, String symbol) {
         int score = 0;
         String oppSymbol = symbol.equals("W") ? "B" : "W";
@@ -50,14 +91,14 @@ public class main {
 
         // Adjust weight based on game phase
         if (emptySpaces > 40) {         // Early game
-            positionalWeight = 1.5;
-            pieceWeight = 0.5;
+            positionalWeight = 18.5;
+            pieceWeight = 17.5;
         } else if (emptySpaces > 20) {  // Mid game
-            positionalWeight = 1.0;
-            pieceWeight = 1.0;
+            positionalWeight = 18.0;
+            pieceWeight = 18.0;
         } else {                        // Late game
-            positionalWeight = 0.5;
-            pieceWeight = 1.5;
+            positionalWeight = 17.5;
+            pieceWeight = 18.5;
         }
 
         int pieceCount = 0; 
@@ -67,7 +108,6 @@ public class main {
                 else if (board[i][j].equals(oppSymbol)) pieceCount--;
             }
         }
-
         int mobility = getAllLegalMoves(board, symbol).size() - getAllLegalMoves(board, oppSymbol).size();
         int stability = 0;
         int[][] stablePositions = {{0, 0}, {0, 7}, {7, 0}, {7, 7}};
@@ -77,16 +117,6 @@ public class main {
         }
 
         int positionalValue = 0;
-        int[][] positionValues = {
-            {4, -2, 2, 2, 2, 2, -2, 4},
-            {-2, -3, 1, 1, 1, 1, -3, -2},
-            {2, 1, 1, 0, 0, 1, 1, 2},
-            {2, 1, 0, 1, 1, 0, 1, 2},
-            {2, 1, 0, 1, 1, 0, 1, 2},
-            {2, 1, 1, 0, 0, 1, 1, 2},
-            {-2, -3, 1, 1, 1, 1, -3, -2},
-            {4, -2, 2, 2, 2, 2, -2, 4}
-        };
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j].equals(symbol)) positionalValue += positionValues[i][j];
@@ -94,7 +124,7 @@ public class main {
             }
         }
 
-        score = (int) (pieceCount * pieceWeight + mobility * 6 + stability * 7 + positionalValue * positionalWeight);
+        score = (int) (pieceCount * pieceWeight + mobility * 18 + stability * 21 + positionalValue * positionalWeight);
      // Define positions adjacent to each corner
         int[][] cornerAdjacents = {
             {0, 1}, {1, 0}, {1, 1}, // Top-left
@@ -130,6 +160,7 @@ public class main {
                 else if (board[i][j].equals(oppSymbol)) score--;
             }
         }
+        updatePositionalValues(board, symbol);
         return score;
     }
     public static int minimax(String[][] board, int depth, int alpha, int beta, boolean maximizingPlayer, String currentPlayer) {
