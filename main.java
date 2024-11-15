@@ -87,18 +87,24 @@ public class main {
             }
         }
         
-        double positionalWeight = 1.0, pieceWeight = 1.0;
+        double positionalWeight = 1.0, pieceWeight = 1.0, stabilityWeight = 1.0, mobilityWeight = 1.0;
 
         // Adjust weight based on game phase
         if (emptySpaces > 40) {         // Early game
             positionalWeight = 18.5;
             pieceWeight = 17.5;
+            stabilityWeight = 11.0;
+            mobilityWeight = 12.0;
         } else if (emptySpaces > 20) {  // Mid game
             positionalWeight = 18.0;
             pieceWeight = 18.0;
+            stabilityWeight = 14.5;
+            mobilityWeight = 18.0;
         } else {                        // Late game
             positionalWeight = 17.5;
-            pieceWeight = 18.5;
+            pieceWeight = 30.0;
+            stabilityWeight = 21.0;
+            mobilityWeight = 24.0;
         }
 
         int pieceCount = 0; 
@@ -112,8 +118,8 @@ public class main {
         int stability = 0;
         int[][] stablePositions = {{0, 0}, {0, 7}, {7, 0}, {7, 7}};
         for (int[] pos : stablePositions) {
-            if (board[pos[0]][pos[1]].equals(symbol)) stability += 5;
-            else if (board[pos[0]][pos[1]].equals(oppSymbol)) stability -= 5;
+            if (board[pos[0]][pos[1]].equals(symbol)) stability += 10;
+            else if (board[pos[0]][pos[1]].equals(oppSymbol)) stability -= 10;
         }
 
         int positionalValue = 0;
@@ -124,7 +130,7 @@ public class main {
             }
         }
 
-        score = (int) (pieceCount * pieceWeight + mobility * 18 + stability * 21 + positionalValue * positionalWeight);
+        score = (int) (pieceCount * pieceWeight + mobility * 18 + stability * stabilityWeight + positionalValue * positionalWeight);
      // Define positions adjacent to each corner
         int[][] cornerAdjacents = {
             {0, 1}, {1, 0}, {1, 1}, // Top-left
@@ -162,6 +168,8 @@ public class main {
         }
         updatePositionalValues(board, symbol);
 
+        // since black always goes first, white goes lowest and black goes highest
+        // therefore invert whites score
         if (symbol.equals("W")) {
             score *= -1;
         }
@@ -394,8 +402,8 @@ public static boolean validMove(String[][] board, int x, int y, String symbol) {
     if (answer.equals("W")) {
         while (gameRunning) {
             printBoard(board);
-
-            if (hasValidMove(board, currentPlayer) && findBestMove(board, currentPlayer) != null) {
+            // && findBestMove(board, currentPlayer) != null
+            if (hasValidMove(board, currentPlayer)) {
                 if (currentPlayer.equals("B")) {
                     System.out.println("AI (B) is making a move...");
                     int[] aiMove = findBestMove(board, "B");
@@ -407,7 +415,7 @@ public static boolean validMove(String[][] board, int x, int y, String symbol) {
                     System.out.print("Enter X coordinate: ");
                     int x = input.nextInt();
 
-                    if (validMove(board, x, y, currentPlayer)) {
+                    if ((x > -1 && x < 8 && y > -1 && y < 8) && validMove(board, x, y, currentPlayer)) {
                         makeMove(board, x, y, currentPlayer);
                     } else {
                         System.out.println("Invalid move. Try again.");
@@ -431,7 +439,7 @@ public static boolean validMove(String[][] board, int x, int y, String symbol) {
     else if (answer.equals("B")) {
         while (gameRunning) {
             printBoard(board);
-            if (hasValidMove(board, currentPlayer) && findBestMove(board, currentPlayer) != null) {
+            if (hasValidMove(board, currentPlayer)) {
                 if (currentPlayer.equals("B")) {
                     System.out.println("Player (B)'s turn.");
                     System.out.print("Enter Y coordinate: ");
@@ -439,7 +447,7 @@ public static boolean validMove(String[][] board, int x, int y, String symbol) {
                     System.out.print("Enter X coordinate: ");
                     int x = input.nextInt();
 
-                    if (validMove(board, x, y, currentPlayer)) {
+                    if ((x > -1 && x < 8 && y > -1 && y < 8) && validMove(board, x, y, currentPlayer)) {
                         makeMove(board, x, y, currentPlayer);
                     } else {
                         System.out.println("Invalid move. Try again.");
@@ -475,7 +483,7 @@ public static boolean validMove(String[][] board, int x, int y, String symbol) {
                 int x = input.nextInt();
 
                 // Make a move if it's valid
-                if (validMove(board, x, y, currentPlayer)) {
+                if ((x > -1 && x < 8 && y > -1 && y < 8) && validMove(board, x, y, currentPlayer)) {
                     makeMove(board, x, y, currentPlayer);
                     printBoard(board);
 
