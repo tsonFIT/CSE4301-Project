@@ -99,12 +99,12 @@ public class main {
             positionalWeight = 18.0;
             pieceWeight = 18.0;
             stabilityWeight = 14.5;
-            mobilityWeight = 18.0;
+            mobilityWeight = 24.0;
         } else {                        // Late game
             positionalWeight = 17.5;
-            pieceWeight = 30.0;
+            pieceWeight = 18.5;
             stabilityWeight = 21.0;
-            mobilityWeight = 24.0;
+            mobilityWeight = 18.0;
         }
 
         int pieceCount = 0; 
@@ -130,7 +130,7 @@ public class main {
             }
         }
 
-        score = (int) (pieceCount * pieceWeight + mobility * 18 + stability * stabilityWeight + positionalValue * positionalWeight);
+        score = (int) (pieceCount * pieceWeight + mobility * mobilityWeight + stability * stabilityWeight + positionalValue * positionalWeight);
      // Define positions adjacent to each corner
         int[][] cornerAdjacents = {
             {0, 1}, {1, 0}, {1, 1}, // Top-left
