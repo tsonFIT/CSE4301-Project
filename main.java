@@ -93,18 +93,18 @@ public class main {
         if (emptySpaces > 40) {         // Early game
             positionalWeight = 18.5;
             pieceWeight = 17.5;
-            stabilityWeight = 11.0;
-            mobilityWeight = 12.0;
+            stabilityWeight = 14.5;
+            mobilityWeight = 18.0;
         } else if (emptySpaces > 20) {  // Mid game
             positionalWeight = 18.0;
             pieceWeight = 18.0;
-            stabilityWeight = 14.5;
+            stabilityWeight = 18.5;
             mobilityWeight = 24.0;
         } else {                        // Late game
             positionalWeight = 17.5;
             pieceWeight = 18.5;
             stabilityWeight = 21.0;
-            mobilityWeight = 18.0;
+            mobilityWeight = 14.0;
         }
 
         int pieceCount = 0; 
@@ -118,8 +118,8 @@ public class main {
         int stability = 0;
         int[][] stablePositions = {{0, 0}, {0, 7}, {7, 0}, {7, 7}};
         for (int[] pos : stablePositions) {
-            if (board[pos[0]][pos[1]].equals(symbol)) stability += 10;
-            else if (board[pos[0]][pos[1]].equals(oppSymbol)) stability -= 10;
+            if (board[pos[0]][pos[1]].equals(symbol)) stability += 20;
+            else if (board[pos[0]][pos[1]].equals(oppSymbol)) stability -= 20;
         }
 
         int positionalValue = 0;
@@ -150,9 +150,9 @@ public class main {
                 for (int[] adj : cornerAdjacents) {
                     if (adj[0] == corner[0] || adj[1] == corner[1]) {
                         if (board[adj[0]][adj[1]].equals(symbol)) {
-                            score -= 100;
+                            score -= 1000;
                         } else if (board[adj[0]][adj[1]].equals(oppSymbol)) {
-                            score += 100;
+                            score += 1000;
                         }
                     }
                 }
