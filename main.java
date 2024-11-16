@@ -118,8 +118,8 @@ public class main {
         int stability = 0;
         int[][] stablePositions = {{0, 0}, {0, 7}, {7, 0}, {7, 7}};
         for (int[] pos : stablePositions) {
-            if (board[pos[0]][pos[1]].equals(symbol)) stability += 20;
-            else if (board[pos[0]][pos[1]].equals(oppSymbol)) stability -= 20;
+            if (board[pos[0]][pos[1]].equals(symbol)) stability += 10;
+            else if (board[pos[0]][pos[1]].equals(oppSymbol)) stability -= 10;
         }
 
         int positionalValue = 0;
@@ -150,9 +150,9 @@ public class main {
                 for (int[] adj : cornerAdjacents) {
                     if (adj[0] == corner[0] || adj[1] == corner[1]) {
                         if (board[adj[0]][adj[1]].equals(symbol)) {
-                            score -= 1000;
+                            score -= 100;
                         } else if (board[adj[0]][adj[1]].equals(oppSymbol)) {
-                            score += 1000;
+                            score += 100;
                         }
                     }
                 }
